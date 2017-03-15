@@ -59,5 +59,5 @@ CREATE VIEW finalAssignments AS SELECT iAsolo.assignment_id, iAsolo.description,
 FROM iAsolo JOIN groupAverages on groupAverages.assignment_id = iAsolo.assignment_id;
 
 
---INSERT INTO q3
+INSERT INTO q3
 	-- put a final query here so that its results will go into the table.
