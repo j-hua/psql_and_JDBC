@@ -39,7 +39,7 @@ select taGradedAll.username,assignment_id, count(grader.group_id) as num_graded
 from grader, taGradedAll, assignmentgroup
 where grader.username = taGradedAll.username and grader.group_id = assignmentgroup.group_id
 group by taGradedAll.username,assignment_id
-having count(grader.group_id) < 1;
+having count(grader.group_id) < 10;
 
 create view taMoreThan10 as 
 select *
@@ -57,6 +57,8 @@ SELECT assignment_id, group_id, 100*SUM(weightedGrade)/SUM(weightedOutOf) as per
 FROM weightedMarks
 Group by group_id, assignment_id;
 
+drop view if exists studentMarks cascade;
+
 create view studentMarks as 
 select taMoreThan10.username, assignment_id, totalMark.group_id,percentage,
 	membership.username as student
@@ -64,11 +66,15 @@ from taMoreThan10,grader,totalMark,membership
 where taMoreThan10.username = grader.username and grader.group_id = totalMark.group_id 
 	and totalMark.group_id = membership.group_id;
 
+drop view if exists taAssig cascade;
+
 create view taAssig as 
 select username, assignment_id, avg(percentage)
 from studentMarks
 group by assignment_id, username;
 
+
+drop view if exists taNotConsis cascade;
 -- ta that does not consistently grade increasingly
 create view taNotConsis as 
 select t1.username, t1.avg

@@ -87,7 +87,6 @@ INSERT INTO Membership VALUES ('s7', 8007);
 INSERT INTO Membership VALUES ('s8', 8008);
 
 
-INSERT INTO Submissions VALUES (2001, 'A1.pdf', 's1', 2000, '2017-02-08 19:59');
 INSERT INTO Submissions VALUES (2003, 'A1.pdf', 's3', 3000, '2017-02-07 19:59');
 INSERT INTO Submissions VALUES (2004, 'A1.pdf', 's4', 3000, '2017-02-07 20:59');
 INSERT INTO Submissions VALUES (2005, 'A1.pdf', 's3', 3000, '2017-02-07 20:59');
@@ -98,14 +97,14 @@ INSERT INTO Submissions VALUES (3003, 'A2.pdf', 's3', 3001, '2017-03-07 19:59');
 INSERT INTO Submissions VALUES (3005, 'A2.pdf', 's5', 5001, '2017-03-08 19:59');
 INSERT INTO Submissions VALUES (3007, 'A2.pdf', 's7', 7001, '2017-03-08 19:59');
 
-INSERT INTO Submissions VALUES (8001, 'A3.pdf', 's1', 2001, '2017-04-08 18:00');
-INSERT INTO Submissions VALUES (8002, 'A3.pdf', 's2', 3001, '2017-04-07 19:59');
-INSERT INTO Submissions VALUES (8003, 'A3.pdf', 's3', 5001, '2017-04-08 16:00');
-INSERT INTO Submissions VALUES (8004, 'A3.pdf', 's4', 7001, '2017-04-07 19:59');
-INSERT INTO Submissions VALUES (8005, 'A3.pdf', 's5', 2001, '2017-04-08 15:00');
-INSERT INTO Submissions VALUES (8006, 'A3.pdf', 's6', 3001, '2017-04-07 19:59');
-INSERT INTO Submissions VALUES (8007, 'A3.pdf', 's7', 5001, '2017-04-08 10:59');
-INSERT INTO Submissions VALUES (8008, 'A3.pdf', 's8', 7001, '2017-04-07 19:59');
+INSERT INTO Submissions VALUES (8011, 'A3.pdf', 's1', 8001, '2017-04-08 18:00');
+INSERT INTO Submissions VALUES (8012, 'A3.pdf', 's2', 8002, '2017-04-07 19:59');
+INSERT INTO Submissions VALUES (8013, 'A3.pdf', 's3', 8003, '2017-04-08 16:00');
+INSERT INTO Submissions VALUES (8014, 'A3.pdf', 's4', 8004, '2017-04-07 19:59');
+INSERT INTO Submissions VALUES (8015, 'A3.pdf', 's5', 8005, '2017-04-08 15:00');
+INSERT INTO Submissions VALUES (8016, 'A3.pdf', 's6', 8006, '2017-04-07 19:59');
+INSERT INTO Submissions VALUES (8017, 'A3.pdf', 's7', 8007, '2017-04-08 10:59');
+INSERT INTO Submissions VALUES (8018, 'A3.pdf', 's8', 8008, '2017-04-07 19:59');
 
 INSERT INTO Grader VALUES (2000, 't1');
 INSERT INTO Grader VALUES (3000, 't1');
@@ -133,8 +132,7 @@ INSERT INTO RubricItem VALUES (5011, 2000, 'tester', 5, 0.5);
 INSERT INTO RubricItem VALUES (6000, 3000, 'style', 4, 0.25);
 INSERT INTO RubricItem VALUES (6001, 3000, 'tester', 12, 0.75);
 
-INSERT INTO Grade VALUES (2000, 4000, 3);
-INSERT INTO Grade VALUES (2000, 4001, 9);
+
 INSERT INTO Grade VALUES (2001, 5010, 3);
 INSERT INTO Grade VALUES (2001, 5011, 5);
 INSERT INTO Grade VALUES (3000, 4000, 3);
@@ -167,7 +165,7 @@ INSERT INTO Grade VALUES (8007, 6001, 12);
 INSERT INTO Grade VALUES (8008, 6000, 3);
 INSERT INTO Grade VALUES (8008, 6001, 12);
 
-INSERT INTO Result VALUES (2000, 12, true);
+INSERT INTO Result VALUES (2000, 12, false);
 INSERT INTO Result VALUES (3000, 11, true);
 INSERT INTO Result VALUES (5000, 9, true);
 INSERT INTO Result VALUES (7000, 13, true);
