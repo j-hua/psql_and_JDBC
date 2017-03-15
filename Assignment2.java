@@ -33,17 +33,9 @@ public class Assignment2 {
      *            the password to be used to connect to the database
      * @return true if connecting is successful, false otherwise
      */
-     public boolean connectDB(String URL, String username, String password) {
-            try
-            {
-		this.connection = DriverManager.getConnection(URL, username, password);
-		return true;
-            }
-            catch (SQLException se)
-            {
-	
-            }
-            return false;
+    public boolean connectDB(String URL, String username, String password) {
+        // Replace this return statement with an implementation of this method!
+        return false;
     }
 
     /**
@@ -52,11 +44,8 @@ public class Assignment2 {
      * @return true if the closing was successful, false otherwise
      */
     public boolean disconnectDB() {
-        if (conn != null) {
-	  try {
-	      conn.close();
-	  } 
-	  catch (SQLException e) {}
+        // Replace this return statement with an implementation of this method!
+        return false;
     }
 
     /**
@@ -73,7 +62,7 @@ public class Assignment2 {
      * @return true if the operation was successful, false otherwise
      */
     public boolean assignGrader(int groupID, String grader) {
-        
+        // Replace this return statement with an implementation of this method!
         return false;
     }
 
