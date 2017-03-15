@@ -42,22 +42,28 @@ CREATE VIEW soloAverages AS SELECT assignment_id,AVG(percentage) as avg_solo, CO
 FROM totalmark JOIN soloWorkers on totalmark.group_id=soloworkers.group_id 
 Group BY assignment_id;
 
-CREATE VIEW groupWorkers AS SELECT group_id, COUNT(*) as group_count
+CREATE VIEW groupSize AS SELECT group_id, COUNT(*) as group_count
 FROM membership
-Group by group_id
-Having COUNT(group_id)>1;
+Group by group_id;
 
+CREATE VIEW groupWorkers AS SELECT group_id, group_count
+FROM group_size
+WHERE group_count>1;
 
-CREATE VIEW groupAverages AS SELECT assignment_id, AVG(percentage) as avg_group, SUM(group_count) as group_size, AVG(group_count) as size_avg
+CREATE VIEW allAverages AS SELECT assignment_id, AVG(group_count) as avg_size
+FROM groupSize
+Group By assignment_id; 
+
+CREATE VIEW groupAverages AS SELECT assignment_id, AVG(percentage) as avg_group, SUM(group_count) as group_size
 FROM totalmark JOIN groupworkers on totalmark.group_id=groupworkers.group_id 
 Group BY assignment_id;
+
 
 CREATE VIEW iAsolo AS SELECT Assignment.assignment_id, Assignment.description, soloAverages.num_solo, soloAverages.avg_solo
 FROM soloAverages RIGHT OUTER JOIN Assignment on soloAverages.assignment_id = Assignment.assignment_id;
 
-CREATE VIEW finalAssignments AS SELECT iAsolo.assignment_id, iAsolo.description, iAsolo.num_solo, iAsolo.avg_solo, group_size, avg_group, size_avg
+CREATE VIEW interm AS SELECT assignment_id,avg_group,group_size,avg_size
+FROM iAsolo JOIN groupAverages ON iAsolo.assignment_id=groupAverages.assignment_id
+
+INSERT INTO q3 SELECT iAsolo.assignment_id, iAsolo.description, iAsolo.num_solo, iAsolo.avg_solo, group_size, avg_group, size_avg
 FROM iAsolo LEFT OUTER JOIN groupAverages on groupAverages.assignment_id = iAsolo.assignment_id;
-
-
-INSERT INTO q3
-	-- put a final query here so that its results will go into the table.
