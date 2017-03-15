@@ -56,7 +56,7 @@ CREATE VIEW iAsolo AS SELECT Assignment.assignment_id, Assignment.description, s
 FROM soloAverages RIGHT OUTER JOIN Assignment on soloAverages.assignment_id = Assignment.assignment_id;
 
 CREATE VIEW finalAssignments AS SELECT iAsolo.assignment_id, iAsolo.description, iAsolo.num_solo, iAsolo.avg_solo, group_size, avg_group, size_avg
-FROM iAsolo JOIN groupAverages on groupAverages.assignment_id = iAsolo.assignment_id;
+FROM iAsolo LEFT OUTER JOIN groupAverages on groupAverages.assignment_id = iAsolo.assignment_id;
 
 
 INSERT INTO q3
