@@ -39,13 +39,45 @@ select taGradedAll.username,assignment_id, count(grader.group_id) as num_graded
 from grader, taGradedAll, assignmentgroup
 where grader.username = taGradedAll.username and grader.group_id = assignmentgroup.group_id
 group by taGradedAll.username,assignment_id
-having count(grader.group_id) < 3;
+having count(grader.group_id) < 1;
 
 create view taMoreThan10 as 
 select *
 from taGradedAll
 where taGradedAll.username NOT IN (select username from taLessThan10);
 
+DROP VIEW IF EXISTS weightedMarks CASCADE;
+DROP VIEW IF EXISTS totalMark CASCADE;
+
+CREATE VIEW weightedMarks AS SELECT assignment_id, group_id, grade.rubric_id, grade*weight as weightedGrade, out_of*weight as weightedOutOf
+FROM RubricItem JOIN grade ON rubricitem.rubric_id = grade.rubric_id;
+
+CREATE VIEW totalMark AS
+SELECT assignment_id, group_id, 100*SUM(weightedGrade)/SUM(weightedOutOf) as percentage
+FROM weightedMarks
+Group by group_id, assignment_id;
+
+create view studentMarks as 
+select taMoreThan10.username, assignment_id, totalMark.group_id,percentage,
+	membership.username as student
+from taMoreThan10,grader,totalMark,membership
+where taMoreThan10.username = grader.username and grader.group_id = totalMark.group_id 
+	and totalMark.group_id = membership.group_id;
+
+create view taAssig as 
+select username, assignment_id, avg(percentage)
+from studentMarks
+group by assignment_id, username;
+
+-- ta that does not consistently grade increasingly
+create view taNotConsis as 
+select t1.username, t1.avg
+from taAssig t1, taAssig t2
+where t1.username = t2.username and t1.assignment_id < t2.assignment_id and t1.avg >= t2.avg;
+
 -- Final answer.
-INSERT INTO q2 
+INSERT INTO q2 (select username as ta_name, avg(avg) as average_mark_all_assignments, max(avg) - min(avg) as mark_change_first_last
+from taAssig
+where taAssig.username not in (select username from taNotConsis)
+group by username);
 	-- put a final query here so that its results will go into the table.
