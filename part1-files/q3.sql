@@ -59,11 +59,11 @@ FROM totalmark JOIN groupworkers on totalmark.group_id=groupworkers.group_id
 Group BY assignment_id;
 
 
-CREATE VIEW iAsolo AS SELECT Assignment.assignment_id, Assignment.description, soloAverages.num_solo, soloAverages.avg_solo
+CREATE VIEW intermSoloAssignments AS SELECT Assignment.assignment_id, Assignment.description, soloAverages.num_solo, soloAverages.avg_solo
 FROM soloAverages RIGHT OUTER JOIN Assignment on soloAverages.assignment_id = Assignment.assignment_id;
 
-CREATE VIEW interm AS SELECT assignment_id,avg_group,group_size,avg_size
-FROM iAsolo JOIN groupAverages ON iAsolo.assignment_id=groupAverages.assignment_id
+CREATE VIEW interm AS SELECT assignment_id,description, num_solo, avg_solo, avg_group ,group_size, 
+FROM intermSoloAssignments JOIN groupAverages ON intermSoloAssignments.assignment_id=groupAverages.assignment_id;
 
-INSERT INTO q3 SELECT iAsolo.assignment_id, iAsolo.description, iAsolo.num_solo, iAsolo.avg_solo, group_size, avg_group, size_avg
-FROM iAsolo LEFT OUTER JOIN groupAverages on groupAverages.assignment_id = iAsolo.assignment_id;
+INSERT INTO q3 SELECT interm.assignment_id, interm.description, interm.num_solo, interm.avg_solo, interm.group_size, interm.avg_group, allAverages.avg_size
+FROM allAverages OUTER JOIN interm on interm.assignment_id = allAverages.assignment_id;
