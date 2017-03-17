@@ -107,8 +107,6 @@ public class Assignment2 {
 			}else{
 
 				int g = rs.getInt("group_id");
-				System.out.println(g);
-
 				queryString = "select * from markus.grader where group_id = \'" + groupID + "\'"+ ';';
 				System.out.println("Query: " + queryString);
 				pStatement = connection.prepareStatement(queryString);
@@ -117,12 +115,13 @@ public class Assignment2 {
 				if(rs.next()){
 					//Returns false if someone has already been assigned to the group
 					retVal = false;
+					System.out.println("someone has already been assigned to the group");
 				}else{
 
 					queryString = " insert into markus.grader values(" + groupID + ",\'" + grader + "\');";
 					System.out.println("Query: " + queryString);
 					pStatement = connection.prepareStatement(queryString);
-					pStatement.executeQuery();
+					pStatement.executeUpdate();
 					retVal = true;
 				}
 
@@ -187,7 +186,7 @@ public class Assignment2 {
 				System.out.println("Query: " + queryString);
 				pStatement = connection.prepareStatement(queryString);
 				rs = pStatement.executeQuery();
-
+				
 				if(rs.next()){
 					do{
 						int g = rs.getInt("group_id");
@@ -227,12 +226,16 @@ public class Assignment2 {
 								");";
 						System.out.println("Query: " + queryString);
 						pStatement = connection.prepareStatement(queryString);
-						pStatement.executeQuery();
+						pStatement.executeUpdate();
 						retVal = true;
 					}else{
 						System.out.println("Group at capacity");
 					}
+				}else{
+					System.out.println("Invalid user");				
 				}
+			}else{
+				System.out.println("there is no assignment with this assignmentID or the groupID has not been declared for the assignment");	
 			}
 
 		}catch (Exception se){
@@ -245,7 +248,7 @@ public class Assignment2 {
 		//if none of the above holds, record the member
 
 		// Replace this return statement with an implementation of this method!
-        return false;
+        return retVal;
     }
 
     /**
@@ -305,11 +308,19 @@ public class Assignment2 {
         // You can put testing code in here. It will not affect our autotester.
 	try{
 		Assignment2 a2 = new Assignment2();
-		if(a2.connectDB("jdbc:postgresql://localhost:5432/csc343","JHUA","")){
+		if(a2.connectDB("jdbc:postgresql://localhost:5432/csc343h-huayufei","huayufei","")){
 			System.out.println("connected");
 		}
-		a2.assignGrader(5000,"t3");
-		boolean res = a2.recordMember(2000,7001,"t2");
+
+		if (a2.assignGrader(5000,"t1")) 
+			System.out.println("TRUE");
+		else 
+			System.out.println("FALSE");
+
+		if(a2.recordMember(4000,2001,"s8"))
+			System.out.println("TURE");
+		else
+			System.out.println("FALSE");
 
 	}catch(SQLException se){
 		System.err.println("SQL Exception." +
