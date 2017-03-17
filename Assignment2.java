@@ -156,7 +156,95 @@ public class Assignment2 {
      * @return true if the operation was successful, false otherwise
      */
     public boolean recordMember(int assignmentID, int groupID, String newMember) {
-        // Replace this return statement with an implementation of this method!
+   		boolean retVal = false;
+		String queryString;
+		PreparedStatement pStatement;
+		ResultSet rs;
+
+		try{
+			queryString = "select * " +
+					"from (select assignment.assignment_id, group_id " +
+						"from markus.assignment full join markus.assignmentgroup " +
+						"on assignment.assignment_id = assignmentgroup.assignment_id) as assigAndGroup" +
+					" where assignment_id = " + assignmentID  + " and group_id = " + groupID + ";";
+			System.out.println("Query: " + queryString);
+			pStatement = connection.prepareStatement(queryString);
+			rs = pStatement.executeQuery();
+
+			//check
+			//there is no assignment with this assignmentID
+			//the groupID has not been declared for the assignment
+			if(rs.next()){
+				//check
+				//newMember is not a valid user
+				queryString = "select * " +
+						"from (select markususer.*, group_id from markus.markususer " +
+							"left join markus.membership " +
+							"on markus.markususer.username = markus.membership.username) as usermembership " +
+						"where username = '" +
+						newMember +
+						"' and type = 'student';";
+				System.out.println("Query: " + queryString);
+				pStatement = connection.prepareStatement(queryString);
+				rs = pStatement.executeQuery();
+
+				if(rs.next()){
+					do{
+						int g = rs.getInt("group_id");
+						if(g == groupID){
+							System.out.println("student is already assigned to the group");
+							return true;
+						}
+					}while(rs.next());
+					//the group is at capacity
+					queryString = "select count " +
+							"from (select count(*), group_id " +
+								"from markus.membership group by group_id) as groupcount " +
+							"where group_id = " +
+							groupID +
+							" ;";
+					System.out.println("Query: " + queryString);
+					pStatement = connection.prepareStatement(queryString);
+					rs = pStatement.executeQuery();
+					rs.next();
+					int numMember = rs.getInt("count");
+
+					queryString = "select group_max from markus.assignment " +
+							"where assignment_id = " +
+							assignmentID +
+							";";
+					System.out.println("Query: " + queryString);
+					pStatement = connection.prepareStatement(queryString);
+					rs = pStatement.executeQuery();
+					rs.next();
+					int max = rs.getInt("group_max");
+
+					if(max > numMember){
+						queryString = "insert into markus.membership values ('" +
+								newMember +
+								"'," +
+								groupID +
+								");";
+						System.out.println("Query: " + queryString);
+						pStatement = connection.prepareStatement(queryString);
+						pStatement.executeQuery();
+						retVal = true;
+					}else{
+						System.out.println("Group at capacity");
+					}
+				}
+			}
+
+		}catch (Exception se){
+			System.err.println("SQL Exception." +
+					"<Message>: " + se.getMessage());
+		}
+
+
+
+		//if none of the above holds, record the member
+
+		// Replace this return statement with an implementation of this method!
         return false;
     }
 
@@ -203,6 +291,12 @@ public class Assignment2 {
      */
     public boolean createGroups(int assignmentToGroup, int otherAssignment,
             String repoPrefix) {
+    	try{
+
+		}catch (Exception se){
+				System.err.println("SQL Exception." +
+						"<Message>: " + se.getMessage());
+		}
         // Replace this return statement with an implementation of this method!
         return false;
     }
@@ -215,6 +309,8 @@ public class Assignment2 {
 			System.out.println("connected");
 		}
 		a2.assignGrader(5000,"t3");
+		boolean res = a2.recordMember(2000,7001,"t2");
+
 	}catch(SQLException se){
 		System.err.println("SQL Exception." +
                         "<Message>: " + se.getMessage());		
