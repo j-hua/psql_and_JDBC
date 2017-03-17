@@ -14,23 +14,26 @@ CREATE TABLE q5 (
 -- that define your intermediate steps.  (But give them better names!)
 DROP VIEW IF EXISTS intermediate_step CASCADE;
 
+DROP VIEW IF EXISTS graderToAssignment CASCADE;
 CREATE VIEW graderToAssignment AS SELECT Grader.username, Grader.group_id, AssignmentGroup.assignment_id
 FROM Grader Join AssignmentGroup on Grader.group_id = AssignmentGroup.group_id;
 
+DROP VIEW IF EXISTS groupCounts CASCADE;
 CREATE VIEW groupCounts AS SELECT username, assignment_id, count(group_id) as group
-FROM graderToStudent
+FROM graderToAssignment
 Group By username, assignment_id;
 
-CREATE VIEW maxMin AS SELECT assignment_id, MAX(group) as max, MIN(group) as min
+DROP VIEW IF EXISTS maxMin CASCADE;
+CREATE VIEW maxMin AS SELECT assignment_id, max(groupCounts.group), min(groupCounts.group)
 FROM groupCounts
-Group By assignment_id
-Having max>min+10;
+Group By assignment_id;
 
-
+DROP VIEW IF EXISTS suchAssignments CASCADE;
 CREATE VIEW suchAssignments AS SELECT DISTINCT assignment_id
-FROM maxMin;
+FROM maxMin
+where max > min + 10;
 
 
 -- Final answer.
-INSERT INTO q5 SELECT assignment_id, username, num_assigned 
-FROM suchAssignments JOIN graderToAssignment ON suchAssignments.assignment_id=graderToAssignment.assignment_id;
+INSERT INTO q5 SELECT suchAssignments.assignment_id, username, groupCounts.group 
+FROM suchAssignments JOIN groupCounts ON suchAssignments.assignment_id=groupCounts.assignment_id;
