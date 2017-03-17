@@ -34,12 +34,16 @@ where grader.group_id = assignmentgroup.group_id
 group by username
 having  count(distinct assignment_id) = ALL ( select * from num_ass);
 
+select * from taGradedAll;
+
 create view taLessThan10 as
 select taGradedAll.username,assignment_id, count(grader.group_id) as num_graded
 from grader, taGradedAll, assignmentgroup
 where grader.username = taGradedAll.username and grader.group_id = assignmentgroup.group_id
 group by taGradedAll.username,assignment_id
-having count(grader.group_id) < 10;
+having count(grader.group_id) < 2;
+
+select * from taLessThan10;
 
 create view taMoreThan10 as 
 select *
@@ -58,7 +62,6 @@ FROM weightedMarks
 Group by group_id, assignment_id;
 
 drop view if exists studentMarks cascade;
-
 create view studentMarks as 
 select taMoreThan10.username, assignment_id, totalMark.group_id,percentage,
 	membership.username as student
@@ -66,12 +69,17 @@ from taMoreThan10,grader,totalMark,membership
 where taMoreThan10.username = grader.username and grader.group_id = totalMark.group_id 
 	and totalMark.group_id = membership.group_id;
 
-drop view if exists taAssig cascade;
-
-create view taAssig as 
+drop view if exists taAssigWithoutDuedate cascade;
+create view taAssigWithoutDuedate as 
 select username, assignment_id, avg(percentage)
 from studentMarks
 group by assignment_id, username;
+
+drop view if exists taAssig cascade;
+create view taAssig as 
+select taAssigWithoutDuedate.*, due_date
+from taAssigWithoutDuedate join assignment
+on taAssigWithoutDuedate.assignment_id = assignment.assignment_id;
 
 
 drop view if exists taNotConsis cascade;
@@ -81,9 +89,15 @@ select t1.username, t1.avg
 from taAssig t1, taAssig t2
 where t1.username = t2.username and t1.assignment_id < t2.assignment_id and t1.avg >= t2.avg;
 
--- Final answer.
-INSERT INTO q2 (select username as ta_name, avg(avg) as average_mark_all_assignments, max(avg) - min(avg) as mark_change_first_last
+drop view if exists finalList cascade;
+create view finalList as 
+select username, avg(avg) as average_mark_all_assignments, max(avg) - min(avg) as mark_change_first_last
 from taAssig
 where taAssig.username not in (select username from taNotConsis)
-group by username);
+group by username;
+
+-- Final answer.
+INSERT INTO q2 (select markususer.firstname || ' ' || markususer.surname as ta_name,average_mark_all_assignments,mark_change_first_last
+from finalList,markususer
+where finalList.username = markususer.username);
 	-- put a final query here so that its results will go into the table.

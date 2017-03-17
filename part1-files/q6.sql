@@ -24,7 +24,7 @@ drop view if exists a1groups CASCADE;
 create view a1groups as
 select group_id
 from assignment, assignmentgroup
-where assignment.assignment_id = assignmentgroup.assignment_id and assignment.description = 'a1';
+where assignment.assignment_id = assignmentgroup.assignment_id and assignment.description = 'A1';
 
 create view MaxAndMin as
 select a1groups.group_id, max(submission_date) as last_time, min(submission_date) as first_time, max(submission_date) - min(submission_date) as elapsed_time  

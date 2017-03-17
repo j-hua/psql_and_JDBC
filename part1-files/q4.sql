@@ -30,14 +30,43 @@ SELECT assignment_id, group_id, 100*SUM(weightedGrade)/SUM(weightedOutOf) as per
 FROM weightedMarks
 Group by group_id, assignment_id;
 
+--create view resultpercentage as
+--select assignment_id, totalMark.group_id, totalMark.percentage, result.released
+--from totalMark,result
+--where totalMark.group_id = result.group_id
+--order by assignment_id;
+
+drop view if exists graderResult CASCADE;
+create view graderResult as 
+select grader.group_id, username, mark
+from grader left join result 
+on grader.group_id = result.group_id;
+
+DROP VIEW IF EXISTS resultpercentage1 CASCADE;
+create view resultpercentage1 as
+select totalMark.assignment_id, totalMark.group_id, totalMark.percentage
+from graderResult, totalMark
+where mark is not null and graderResult.group_id = totalMark.group_id;
+
+DROP VIEW IF EXISTS resultpercentage2 CASCADE;
+create view resultpercentage2 as
+select graderResult.group_id, assignment_id, percentage
+from graderResult left join resultpercentage1
+on graderResult.group_id = resultpercentage1.group_id;
+
+DROP VIEW IF EXISTS resultpercentage CASCADE;
 create view resultpercentage as
-select assignment_id, totalMark.group_id, totalMark.percentage, result.released
-from totalMark,result
-where totalMark.group_id = result.group_id
-order by assignment_id;
+select  assignmentgroup.assignment_id,resultpercentage2.group_id, percentage
+from resultpercentage2,assignmentgroup
+where resultpercentage2.group_id = assignmentgroup.group_id;
+--DROP VIEW IF EXISTS resultpercentage CASCADE;
+--create view resultpercentage as
+--select totalMark.assignment_id, totalMark.group_id, totalMark.percentage
+--from assignmentgroup left join totalMark
+--on result.group_id = totalMark.group_id; 
 
 create view numGradedNotGraded as
-select assignment_id, username, SUM(case when released = true then 1 else 0 end) as num_marked, SUM(case when released = false then 1 else 0 end) as num_not_marked  
+select assignment_id, username, count(percentage) as num_marked, count(resultpercentage.group_id) - count(resultpercentage.percentage) as num_not_marked  
 from grader,resultpercentage
 where grader.group_id = resultpercentage.group_id
 group by assignment_id, username;
@@ -45,7 +74,7 @@ group by assignment_id, username;
 create view gradedMaxMin as
 select assignment_id, username, max(percentage) max_mark, min(percentage) as min_mark
 from grader, resultpercentage
-where released = true and grader.group_id = resultpercentage.group_id
+where grader.group_id = resultpercentage.group_id
 group by assignment_id, username;
 
 -- Final answer.

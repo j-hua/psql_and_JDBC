@@ -27,12 +27,14 @@ select assignment.assignment_id, assignmentgroup.group_id
 from assignmentgroup, assignment
 where assignmentgroup.assignment_id = assignment.assignment_id and group_max > '1';
 
+drop view if exists soloAssig cascade;
 CREATE view soloAssig as 
 select assignment.assignment_id, assignmentgroup.group_id
 from assignmentgroup, assignment
 where assignmentgroup.assignment_id = assignment.assignment_id and group_max = '1';
 
 --find students who worked solo in group assignments
+drop view if exists soloGroup CASCADE;
 CREATE view soloGroup as
 select groupAssig.group_id, count(username)
 from groupAssig,membership
@@ -40,9 +42,16 @@ where groupAssig.group_id = membership.group_id
 group by groupAssig.group_id
 having count(username) = 1; 
 
+--filter out groups that did not submit assignment
+--drop view if exists sologroup cascade;
+--create view soloGroup as
+--select *
+--from soloGroupClaimed
+--where soloGroupClaimed.group_id in (select group_id from submissions);
+
 --find qualified students 
 CREATE view studentNeverSolo as 
-select distinct membership.username as student
+select distinct membership.username
 from groupAssig, membership
 where groupAssig.group_id = membership.group_id 
 	and membership.username not in 
@@ -50,10 +59,10 @@ where groupAssig.group_id = membership.group_id
 
 --find students who submitted at least one file for every assignment
 CREATE view studentSubmitEvery as
-select username
-from groupAssig join submissions
-on groupAssig.group_id = submissions.group_id
-group by submissions.username
+select studentNeverSolo.username
+from studentNeverSolo,submissions,groupassig
+where studentNeverSolo.username = submissions.username and submissions.group_id = groupassig.group_id
+group by studentNeverSolo.username
 having count(distinct assignment_id) = (select count(distinct assignment_id) from groupAssig);
 
 DROP VIEW IF EXISTS weightedMarks CASCADE;
