@@ -25,7 +25,7 @@ public class Assignment2 {
      * instance variable 'connection'. In addition, sets the search path to
      * markus.
      * 
-     * @param url
+     * @param URL
      *            the url for the database
      * @param username
      *            the username to be used to connect to the database
@@ -56,18 +56,18 @@ public class Assignment2 {
     public boolean disconnectDB() {
         // Replace this return statement with an implementation of this method!
         boolean retVal = false;
-			
-	try{
-		if(connection!= null){
-			connection.close();
-			retVal = true;		
-		}
-	}catch(SQLException se){
-		System.err.println("SQL Exception." +
-                        "<Message>: " + se.getMessage());		
-	}
-	
-        return retVal;
+    			
+    	try{
+    		if(connection!= null){
+    			connection.close();
+    			retVal = true;		
+    		}
+    	}catch(SQLException se){
+    		System.err.println("SQL Exception." +
+                            "<Message>: " + se.getMessage());		
+    	}
+    	
+            return retVal;
     }
 
     /**
@@ -86,41 +86,53 @@ public class Assignment2 {
     public boolean assignGrader(int groupID, String grader) {
         // Replace this return statement with an implementation of this method!
      
-
-	// Executing this query without having first prepared it
-        // would be safe because the entire query is hard-coded.  
-        // No one can inject any SQL code into our query.
-        // But let's get in the habit of using a prepared statement.
-	       
-	
-	
-	//Returns false if the groupID does not exist in the AssignmentGroup table
-
-	try{
-		String queryString = "select * from assignmentgroup where group_id = \'" + groupID + "\'";
-		System.out.println("Query: " + queryString);
-		PreparedStatement pStatement = connection.prepareStatement(queryString);
-		ResultSet rs = pStatement.executeQuery();
-		if(!rs.next()){
-			//no data
-			System.out.println("no data");
-		}else{
-		
-			int g = rs.getInt("group_id");
-			System.out.println(g);
-	
-		}	 	
-	}catch(Exception se){
-			System.err.println("SQL Exception." +
-                        "<Message>: " + se.getMessage());
-	}		
-	
-		
+		boolean retVal = false;
 	
 
-	// Iterate through the result set and report on each tuple.
+		String queryString;
+		PreparedStatement pStatement;
+		ResultSet rs;
+		try{
 
-	return false;
+			queryString = "select * from markus.assignmentgroup where group_id = \'" + groupID + "\'"+ ';';
+			System.out.println("Query: " + queryString);
+			pStatement = connection.prepareStatement(queryString);
+			rs = pStatement.executeQuery();
+
+			if(!rs.next()){
+				//no data
+				//Returns false if the groupID does not exist in the AssignmentGroup table
+				retVal = false;
+				System.out.println("group id does not exist in assignmentgroup table");
+			}else{
+
+				int g = rs.getInt("group_id");
+				System.out.println(g);
+
+				queryString = "select * from markus.grader where group_id = \'" + groupID + "\'"+ ';';
+				System.out.println("Query: " + queryString);
+				pStatement = connection.prepareStatement(queryString);
+				rs = pStatement.executeQuery();
+
+				if(rs.next()){
+					//Returns false if someone has already been assigned to the group
+					retVal = false;
+				}else{
+
+					queryString = " insert into markus.grader values(" + groupID + ",\'" + grader + "\');";
+					System.out.println("Query: " + queryString);
+					pStatement = connection.prepareStatement(queryString);
+					pStatement.executeQuery();
+					retVal = true;
+				}
+
+			}
+		}catch(Exception se){
+				System.err.println("SQL Exception." +
+							"<Message>: " + se.getMessage());
+		}
+
+		return retVal;
     }
 
     /**
@@ -199,10 +211,10 @@ public class Assignment2 {
         // You can put testing code in here. It will not affect our autotester.
 	try{
 		Assignment2 a2 = new Assignment2();
-		if(a2.connectDB("jdbc:postgresql://localhost:5432/csc343h-huayufei","huayufei","")){
+		if(a2.connectDB("jdbc:postgresql://localhost:5432/csc343","JHUA","")){
 			System.out.println("connected");
 		}
-		a2.assignGrader(2000,"t1");
+		a2.assignGrader(5000,"t3");
 	}catch(SQLException se){
 		System.err.println("SQL Exception." +
                         "<Message>: " + se.getMessage());		
